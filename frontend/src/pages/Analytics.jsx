@@ -71,13 +71,14 @@ export default function Analytics() {
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
           <thead>
             <tr style={{ background: '#0f172a' }}>
-              {['Vehicle', 'Revenue', 'Expenses', 'Maintenance', 'Total Cost', 'Profit'].map(h => <th key={h} style={{ textAlign: 'left', padding: '0.75rem', color: '#64748b', fontWeight: 500 }}>{h}</th>)}
+              {['Vehicle', 'Purchase Price', 'Revenue', 'Expenses', 'Maintenance', 'Total Cost', 'Profit'].map(h => <th key={h} style={{ textAlign: 'left', padding: '0.75rem', color: '#64748b', fontWeight: 500 }}>{h}</th>)}
             </tr>
           </thead>
           <tbody>
             {perVehicle.map(v => (
               <tr key={v.id} style={{ borderTop: '1px solid #334155' }}>
                 <td style={td}>{v.name}</td>
+                <td style={{ ...td, color: '#94a3b8' }}>₹{Number(v.purchase_cost || 0).toLocaleString()}</td>
                 <td style={{ ...td, color: '#22c55e' }}>₹{Number(v.revenue).toLocaleString()}</td>
                 <td style={{ ...td, color: '#ef4444' }}>₹{Number(v.expenses).toLocaleString()}</td>
                 <td style={{ ...td, color: '#fb923c' }}>₹{Number(v.maintenance).toLocaleString()}</td>
