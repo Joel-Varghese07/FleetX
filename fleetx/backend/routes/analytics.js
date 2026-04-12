@@ -19,13 +19,19 @@ router.get('/summary', auth, (req, res) => {
   const totalExpenses = db.prepare(`SELECT COALESCE(SUM(amount),0) as total FROM expenses ${eFilter}`).get(...eParams).total;
   const totalRevenue = db.prepare(`SELECT COALESCE(SUM(amount),0) as total FROM revenue ${rFilter}`).get(...rParams).total;
   const totalMaintenance = db.prepare(`SELECT COALESCE(SUM(cost),0) as total FROM maintenance ${mFilter}`).get(...mParams).total;
-  const totalInvestment = db.prepare('SELECT COALESCE(SUM(purchase_cost),0) as total FROM vehicles').get().total;
+  
+  let vFilter = 'WHERE 1=1', vParams = [];
+  if (vehicle_id) { vFilter += ' AND id = ?'; vParams.push(vehicle_id); }
+  const totalInvestment = db.prepare(`SELECT COALESCE(SUM(purchase_cost),0) as total FROM vehicles ${vFilter}`).get(...vParams).total;
 
-  const totalCost = totalExpenses + totalMaintenance;
+  const totalCost = totalExpenses + totalMaintenance + totalInvestment;
   const profit = totalRevenue - totalCost;
   const roi = totalInvestment > 0 ? ((profit / totalInvestment) * 100).toFixed(2) : 0;
 
   const byType = db.prepare(`SELECT type, SUM(amount) as total FROM expenses ${eFilter} GROUP BY type`).all(...eParams);
+  if (totalInvestment > 0) {
+    byType.push({ type: 'Purchase Cost', total: totalInvestment });
+  }
   const monthly = db.prepare(`
     SELECT strftime('%Y-%m', date) as month, SUM(amount) as expenses
     FROM expenses ${eFilter} GROUP BY month ORDER BY month
@@ -40,7 +46,7 @@ router.get('/summary', auth, (req, res) => {
 
 router.get('/vehicles', auth, (req, res) => {
   const rows = db.prepare(`
-    SELECT v.id, v.name, v.registration,
+    SELECT v.id, v.name, v.registration, v.purchase_cost,
       COALESCE((SELECT SUM(amount) FROM expenses WHERE vehicle_id=v.id),0) as expenses,
       COALESCE((SELECT SUM(amount) FROM revenue WHERE vehicle_id=v.id),0) as revenue,
       COALESCE((SELECT SUM(cost) FROM maintenance WHERE vehicle_id=v.id),0) as maintenance
@@ -48,8 +54,8 @@ router.get('/vehicles', auth, (req, res) => {
   `).all();
   const result = rows.map(r => ({
     ...r,
-    totalCost: r.expenses + r.maintenance,
-    profit: r.revenue - r.expenses - r.maintenance
+    totalCost: r.expenses + r.maintenance + (r.purchase_cost || 0),
+    profit: r.revenue - (r.expenses + r.maintenance + (r.purchase_cost || 0))
   }));
   res.json(result);
 });
