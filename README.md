@@ -2,6 +2,9 @@
 A Solution to commercial vehicle management
 
 Download the zip file and extract to C:\
+Make sure nodejs is installed:\
+  Installation:\
+      open terminal: winget install node.js
 Open 2 terminal windows\
   Terminal 1: cd fleetx/backend\
 npm run dev\
