@@ -3,6 +3,7 @@ A Solution to commercial vehicle management
 
 Download the zip file and extract to C:\
 Make sure nodejs is installed:\
+run command in terminal: Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned:\
   Installation:\
       open terminal: winget install node.js
 Open 2 terminal windows\
