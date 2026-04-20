@@ -35,7 +35,8 @@ export default function Login({ onLogin }) {
       <div style={{
         position: 'absolute', inset: 0, opacity: 0.03,
         backgroundImage: 'linear-gradient(#00d4ff 1px, transparent 1px), linear-gradient(90deg, #00d4ff 1px, transparent 1px)',
-        backgroundSize: '40px 40px'
+        backgroundSize: '40px 40px',
+        pointerEvents: 'none'
       }} />
 
       {/* Glow orbs */}
